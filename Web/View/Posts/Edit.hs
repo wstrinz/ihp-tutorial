@@ -1,10 +1,12 @@
 module Web.View.Posts.Edit where
+
 import Web.View.Prelude
 
-data EditView = EditView { post :: Post }
+data EditView = EditView {post :: Post}
 
 instance View EditView where
-    html EditView { .. } = [hsx|
+  html EditView {..} =
+    [hsx|
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href={PostsAction}>Posts</a></li>
@@ -16,8 +18,11 @@ instance View EditView where
     |]
 
 renderForm :: Post -> Html
-renderForm post = formFor post [hsx|
+renderForm post =
+  formFor
+    post
+    [hsx|
     {(textField #title)}
-    {(textField #body)}
+    {(textareaField #body) {helpText = "Here be markdown"}}
     {submitButton}
 |]

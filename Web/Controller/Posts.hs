@@ -1,9 +1,10 @@
 module Web.Controller.Posts where
 
+import qualified Text.MMark as MMark
 import Web.Controller.Prelude
 import Web.View.Posts.Edit
 import Web.View.Posts.Index
-import Web.View.Posts.New
+import Web.View.Posts.New (NewView (NewView, post))
 import Web.View.Posts.Show
 
 instance Controller PostsController where
@@ -14,7 +15,10 @@ instance Controller PostsController where
     let post = newRecord
     render NewView {..}
   action ShowPostAction {postId} = do
-    post <- fetch postId
+    post <-
+      fetch postId
+        >>= pure . modify #comments (orderByDesc #createdAt)
+        >>= fetchRelated #comments
     render ShowView {..}
   action EditPostAction {postId} = do
     post <- fetch postId
@@ -49,3 +53,10 @@ buildPost post =
   post
     |> fill @["title", "body"]
     |> validateField #title nonEmpty
+    |> validateField #body nonEmpty
+    |> validateField #body isMarkdown
+
+isMarkdown text =
+  case MMark.parse "" text of
+    Left _ -> Failure "Invalid Markdown"
+    Right _ -> Success

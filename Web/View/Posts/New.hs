@@ -1,10 +1,12 @@
 module Web.View.Posts.New where
+
 import Web.View.Prelude
 
-data NewView = NewView { post :: Post }
+data NewView = NewView {post :: Post}
 
 instance View NewView where
-    html NewView { .. } = [hsx|
+  html NewView {..} =
+    [hsx|
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href={PostsAction}>Posts</a></li>
@@ -16,8 +18,11 @@ instance View NewView where
     |]
 
 renderForm :: Post -> Html
-renderForm post = formFor post [hsx|
+renderForm post =
+  formFor
+    post
+    [hsx|
     {(textField #title)}
-    {(textField #body)}
+    {(textareaField #body) {helpText = "Here be markdown"}}
     {submitButton}
 |]
